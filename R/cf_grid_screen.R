@@ -1,3 +1,5 @@
+#' Create a contour plot from a grid of data
+#' 
 #' Makes filled contour plot with an optional sidebar, essentially filled.contour function.
 #' This version uses the split.screen() function to add the sidebar if bar is TRUE.
 #' By default it won't show the bar but will show the min and max values in the plot title
@@ -5,15 +7,21 @@
 #' Using this function will make other functions such as points() called afterwards not put points
 #' where you expect. Pass anything you want added to the plot area to afterplotfunc
 #' as a function to get it to work properly.
+#' 
 #' @param x  x values, must form grid with y. If not given, it is assumed to be from 0 to 1.
 #' @param y  y values, must form grid with x. If not given, it is assumed to be from 0 to 1.
 #' @param z  z values at grid locations
 #' @param xlim  x limits for the plot.
 #' @param ylim  y limits for the plot.
 #' @param zlim  z limits for the plot.
+#' @param with_lines Should lines be added on top of 
+#' contour to show contours?
+#' @param lines_only Should no fill be used, only contour lines?
 #' @param levels  a set of levels which are used to partition the range of z. Must be strictly increasing (and finite). Areas with z values between consecutive levels are painted with the same color.
 #' @param nlevels  if levels is not specified, the range of z, values is divided into approximately this many levels.
-#' @param color.palette  a color palette function to be used to assign colors in the plot.
+#' @param color.palette  A color palette function to be used to assign colors
+#' in the plot. Defaults to cm.colors.strong. Other options include rainbow,
+#' heat.colors, terrain.colors, topo.colors, and function(x) {gray((1:x)/x)}.
 #' @param col  an explicit set of colors to be used in the plot. This argument overrides any palette function specification. There should be one less color than levels
 #' @param plot.title  statements which add titles to the main plot.
 #' @param plot.axes  statements which draw axes (and a box) on the main plot. This overrides the default axes.
@@ -37,6 +45,8 @@
 #' @param afterplotfunc Function to call after plotting, such as adding points or lines.
 #' @param cex.main The size of the main title. 1.2 is default.
 #' @param par.list List of options to pass to par
+#' @param xaxis Should x axis be added?
+#' @param yaxis Should y axis be added?
 #' @param ...  additional graphical parameters, currently only passed to title().
 #' @importFrom grDevices cm.colors
 #' @importFrom graphics .filled.contour
@@ -53,6 +63,8 @@
 #' x <- y <- seq(-4*pi, 4*pi, len = 27)
 #' r <- sqrt(outer(x^2, y^2, "+"))
 #' cf_grid(cos(r^2)*exp(-r/(2*pi)))
+#' cf_grid(r, color.palette=heat.colors, bar=TRUE)
+#' cf_grid(r, color.palette=function(x) {gray((1:x)/x)}, bar=TRUE)
 #' @references
 #' [1] filled.contour R function, copied function but removed part for sidebar
 #' @references
@@ -62,7 +74,7 @@ cf_grid <-
   function (x = seq(0, 1, length.out = nrow(z)), 
             y = seq(0, 1,length.out = ncol(z)), z, xlim = range(x, finite = TRUE),
             ylim = range(y, finite = TRUE), zlim = range(z, finite = TRUE),
-            levels = pretty(zlim, nlevels), nlevels = 20, color.palette = cm.colors,
+            levels = pretty(zlim, nlevels), nlevels = 20, color.palette = cm.colors.strong,
             col = color.palette(length(levels) - 1), plot.title, plot.axes,
             key.title, key.axes, asp = NA, xaxs = "i", yaxs = "i", las = 1,
             axes = TRUE, frame.plot = axes, bar=F, pts=NULL, reset.par=TRUE,
@@ -71,6 +83,8 @@ cf_grid <-
             afterplotfunc=NULL,
             cex.main=par()$cex.main,
             par.list=NULL,
+            xaxis=TRUE, yaxis=TRUE,
+            with_lines=FALSE, lines_only=FALSE,
             ...)
   {#browser()
     # filled.contour gives unnecessary legend, this function removes it
@@ -84,13 +98,13 @@ cf_grid <-
           z <- x$z
           y <- x$y
           x <- x$x
-        }
-        else {
+        } else {
           z <- x
           x <- seq.int(0, 1, length.out = nrow(z))
         }
+      } else {
+        stop("no 'z' matrix specified")
       }
-      else stop("no 'z' matrix specified")
     }
     else if (is.list(x)) {
       y <- x$y
@@ -159,6 +173,27 @@ cf_grid <-
       mar[2] <- 2.5 # left
       mar[3] <- if (mainminmax | !is.null(main)) 1.3 else .3 # top
       mar[4] <- 1 # right
+      
+      # if (!missing(plot.axes)) {
+      #   # TODO I shouldn't use plot.axes like this, FIX THIS
+      #   mar[1] <- .3 # bottom
+      #   mar[2] <- .3 # left
+      #   mar[4] <- .3 # 1 # right
+      # }
+      if (!xaxis && !yaxis) {
+        mar[1] <- .3 # bottom
+        mar[2] <- .3 # left
+        mar[3] <- if (mainminmax | !is.null(main)) 1.3 else .3 # top
+        mar[4] <- .3 # right
+      } else if (!xaxis) {
+        mar[1] <- 1-.7 # bottom
+        mar[3] <- if (mainminmax | !is.null(main)) 1.3 else .3 # top
+        mar[4] <- .3 # right
+      } else if (!yaxis) {
+        mar[2] <- 1-.7 # left
+        mar[3] <- if (mainminmax | !is.null(main)) 1.3 else .3 # top
+        mar[4] <- .3 # right
+      }
     }
     par(mar = mar)
     # par(cex.axis = 2)
@@ -170,13 +205,17 @@ cf_grid <-
       storage.mode(z) <- "double"
     #.Internal(filledcontour(as.double(x), as.double(y), z, as.double(levels),
     #                        col = col))
-    .filled.contour(as.double(x), as.double(y), z, as.double(levels),
-                    col = col)
+    if (!lines_only) {
+      .filled.contour(as.double(x), as.double(y), z, as.double(levels),
+                      col = col)
+    }
+    # Something like this will remove axis numbers and ticks
+    # Axis(x, side=1, labels=F, tick=F)
     if (missing(plot.axes)) {
       if (axes) {
-        title(main = "", xlab = "", ylab = "")
-        Axis(x, side = 1)
-        Axis(y, side = 2)
+        # title(main = "", xlab = "", ylab = "")
+        if (xaxis) Axis(x, side = 1)
+        if (yaxis) Axis(y, side = 2)
       }
     }
     else plot.axes
@@ -187,9 +226,19 @@ cf_grid <-
     #else plot.title
     
     if (mainminmax | !is.null(main)) {
-      make.multicolor.title(main=main, z=z, pretitle=pretitle, posttitle=posttitle, mainminmax_minmax=mainminmax_minmax, cex.main=cex.main)
+      make.multicolor.title(main=main, z=z, pretitle=pretitle,
+                            posttitle=posttitle,
+                            mainminmax_minmax=mainminmax_minmax,
+                            col_min=col[1], col_max=col[length(col)],
+                            cex.main=cex.main)
     }
     
+    # Add contour lines if required
+    if (with_lines || lines_only) {
+      contour(x=x, y=y, z=z, add=T)
+    }
+    
+    # Add points (pts) if given
     if (!is.null(pts)) {
       if (!is.matrix(pts)) { # if not a matrix, make it a matrix by row
         if (is.numeric(pts) && (length(pts)%%2==0)) {

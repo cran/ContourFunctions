@@ -2,24 +2,19 @@
 % Please edit documentation in R/cf_grid_screen.R
 \name{cf_grid}
 \alias{cf_grid}
-\title{Makes filled contour plot with an optional sidebar, essentially filled.contour function.
-This version uses the split.screen() function to add the sidebar if bar is TRUE.
-By default it won't show the bar but will show the min and max values in the plot title
-along with their colors.
-Using this function will make other functions such as points() called afterwards not put points
-where you expect. Pass anything you want added to the plot area to afterplotfunc
-as a function to get it to work properly.}
+\title{Create a contour plot from a grid of data}
 \usage{
 cf_grid(x = seq(0, 1, length.out = nrow(z)), y = seq(0, 1, length.out =
   ncol(z)), z, xlim = range(x, finite = TRUE), ylim = range(y, finite =
-  TRUE), zlim = range(z, finite = TRUE), levels = pretty(zlim, nlevels),
-  nlevels = 20, color.palette = cm.colors,
-  col = color.palette(length(levels) - 1), plot.title, plot.axes, key.title,
-  key.axes, asp = NA, xaxs = "i", yaxs = "i", las = 1, axes = TRUE,
-  frame.plot = axes, bar = F, pts = NULL, reset.par = TRUE,
-  pretitle = "", posttitle = "", main = NULL, mainminmax = !bar,
-  mainminmax_minmax = TRUE, afterplotfunc = NULL,
-  cex.main = par()$cex.main, par.list = NULL, ...)
+  TRUE), zlim = range(z, finite = TRUE), levels = pretty(zlim,
+  nlevels), nlevels = 20, color.palette = cm.colors.strong,
+  col = color.palette(length(levels) - 1), plot.title, plot.axes,
+  key.title, key.axes, asp = NA, xaxs = "i", yaxs = "i", las = 1,
+  axes = TRUE, frame.plot = axes, bar = F, pts = NULL,
+  reset.par = TRUE, pretitle = "", posttitle = "", main = NULL,
+  mainminmax = !bar, mainminmax_minmax = TRUE, afterplotfunc = NULL,
+  cex.main = par()$cex.main, par.list = NULL, xaxis = TRUE,
+  yaxis = TRUE, with_lines = FALSE, lines_only = FALSE, ...)
 }
 \arguments{
 \item{x}{x values, must form grid with y. If not given, it is assumed to be from 0 to 1.}
@@ -38,7 +33,9 @@ cf_grid(x = seq(0, 1, length.out = nrow(z)), y = seq(0, 1, length.out =
 
 \item{nlevels}{if levels is not specified, the range of z, values is divided into approximately this many levels.}
 
-\item{color.palette}{a color palette function to be used to assign colors in the plot.}
+\item{color.palette}{A color palette function to be used to assign colors
+in the plot. Defaults to cm.colors.strong. Other options include rainbow,
+heat.colors, terrain.colors, topo.colors, and function(x) {gray((1:x)/x)}.}
 
 \item{col}{an explicit set of colors to be used in the plot. This argument overrides any palette function specification. There should be one less color than levels}
 
@@ -85,6 +82,15 @@ unless you need to add something to the plot afterwards and bar is TRUE.}
 
 \item{par.list}{List of options to pass to par}
 
+\item{xaxis}{Should x axis be added?}
+
+\item{yaxis}{Should y axis be added?}
+
+\item{with_lines}{Should lines be added on top of 
+contour to show contours?}
+
+\item{lines_only}{Should no fill be used, only contour lines?}
+
 \item{...}{additional graphical parameters, currently only passed to title().}
 }
 \description{
@@ -100,6 +106,8 @@ as a function to get it to work properly.
 x <- y <- seq(-4*pi, 4*pi, len = 27)
 r <- sqrt(outer(x^2, y^2, "+"))
 cf_grid(cos(r^2)*exp(-r/(2*pi)))
+cf_grid(r, color.palette=heat.colors, bar=TRUE)
+cf_grid(r, color.palette=function(x) {gray((1:x)/x)}, bar=TRUE)
 }
 \references{
 [1] filled.contour R function, copied function but removed part for sidebar

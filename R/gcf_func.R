@@ -17,41 +17,39 @@
 #' #@param title Title for the plot
 #' #@param mainminmax_minmax Whether [min,max]= should be shown in title or just the numbers
 #' @param pts Points to plot on top of contour
-#' @param gg Should ggplot2 be used? Will use gcf_grid() instead of cf_grid().
 #' @param ...  Passed to cf_grid
 #' @examples 
-#' cf_func(function(x){x[1]*x[2]})
-#' cf_func(function(x)(exp(-(x[1]-.5)^2-5*(x[2]-.5)^2)))
-#' cf_func(function(xx){exp(-sum((xx-.5)^2/.1))}, bar=TRUE)
-#' cf_func(function(xx){exp(-sum((xx-.5)^2/.1))}, bar=TRUE, mainminmax=TRUE)
-#' cf_func(function(x)(exp(-(x[1]-.5)^2-5*(x[2]-.5)^2)), with_lines=TRUE)
-#' @references
-#' [1] filled.contour R function, copied function but removed part for sidebar
-#' @references
-#' [2] http://stackoverflow.com/questions/16774928/removing-part-of-a-graphic-in-r, answer by P Lapointe
+#' gcf_func(function(x){x[1]*x[2]})
+#' gcf_func(function(x)(exp(-(x[1]-.5)^2-5*(x[2]-.5)^2)))
+#' gcf_func(function(xx){exp(-sum((xx-.5)^2/.1))}, bar=TRUE, color.palette=terrain.colors)
+#' gcf_func(function(xx){exp(-sum((xx-.5)^2/.1))}, bar=TRUE, mainminmax=TRUE)
+#' gcf_func(function(x)(exp(-(x[1]-.5)^2-5*(x[2]-.5)^2)))
 #' @export
-cf_func <- function(fn0, n=100,
+gcf_func <- function(fn0, n=100,
                     xlim=c(0,1), ylim=c(0,1), xylim=NULL,
                     batchmax=1, out.col.name=NULL,
                     out.name=NULL,
                     pts=NULL,
-                    gg=FALSE,
                     ...) {
-  if(!is.null(out.col.name)) {
-    fn <- function(xx){fn0(xx)[,out.col.name]}
-  } else if (!is.null(out.name)) {
-    fn <- function(xx){fn0(xx)[[out.name]]}
-  } else {
-    fn <- fn0
-  }
-  if (!is.null(xylim)) {xlim <- ylim <- xylim}
-  x <- seq(xlim[1],xlim[2],length.out = n)
-  y <- seq(ylim[1],ylim[2],length.out = n)
-  z <- eval_over_grid_with_batch(x, y, fn, batchmax)
-  
-  if (gg) {
-    gcf_grid(x,y,z, pts=pts, ...)
-  } else {
-    cf_grid(x,y,z, pts=pts, ...)
-  }
+  cf_func(fn0=fn0, n=n,
+          xlim=xlim, ylim=ylim, xylim=xylim,
+          batchmax=batchmax,
+          out.col.name=out.col.name,
+          out.name=out.name,
+          pts=pts,
+          gg=TRUE,
+          ...)
+  # if(!is.null(out.col.name)) {
+  #   fn <- function(xx){fn0(xx)[,out.col.name]}
+  # } else if (!is.null(out.name)) {
+  #   fn <- function(xx){fn0(xx)[[out.name]]}
+  # } else {
+  #   fn <- fn0
+  # }
+  # if (!is.null(xylim)) {xlim <- ylim <- xylim}
+  # x <- seq(xlim[1],xlim[2],length.out = n)
+  # y <- seq(ylim[1],ylim[2],length.out = n)
+  # z <- eval_over_grid_with_batch(x, y, fn, batchmax)
+  # 
+  # gcf_grid(x,y,z, pts=pts, ...)
 }

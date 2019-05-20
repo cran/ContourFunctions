@@ -1,7 +1,7 @@
 Package: ContourFunctions
 Type: Package
 Title: Create Contour Plots from Data or a Function
-Version: 0.1.0
+Version: 0.1.1
 Authors@R: person("Collin", "Erickson", 
   email = "collinberickson@gmail.com",
   role = c("aut", "cre"))
@@ -10,13 +10,14 @@ Description: Provides functions for making contour plots.
   or a data set. If non-grid data is given, then a Gaussian
   process is fit to the data and used to create the contour plot.
 License: GPL-3
-RoxygenNote: 6.0.1
-Suggests: knitr, rmarkdown, mlegp, laGP
+RoxygenNote: 6.1.1
+Suggests: knitr, rmarkdown, lhs, mlegp, ggplot2, laGP, covr, testthat
 VignetteBuilder: knitr
 URL: https://github.com/CollinErickson/contour
+Encoding: UTF-8
 NeedsCompilation: no
-Packaged: 2017-05-04 12:30:33 UTC; cbe117
+Packaged: 2019-05-20 02:47:59 UTC; cbe117
 Author: Collin Erickson [aut, cre]
 Maintainer: Collin Erickson <collinberickson@gmail.com>
 Repository: CRAN
-Date/Publication: 2017-05-04 16:22:19 UTC
+Date/Publication: 2019-05-20 04:10:03 UTC
