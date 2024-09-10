@@ -4,17 +4,44 @@
 \alias{cf_grid}
 \title{Create a contour plot from a grid of data}
 \usage{
-cf_grid(x = seq(0, 1, length.out = nrow(z)), y = seq(0, 1, length.out =
-  ncol(z)), z, xlim = range(x, finite = TRUE), ylim = range(y, finite =
-  TRUE), zlim = range(z, finite = TRUE), levels = pretty(zlim,
-  nlevels), nlevels = 20, color.palette = cm.colors.strong,
-  col = color.palette(length(levels) - 1), plot.title, plot.axes,
-  key.title, key.axes, asp = NA, xaxs = "i", yaxs = "i", las = 1,
-  axes = TRUE, frame.plot = axes, bar = F, pts = NULL,
-  reset.par = TRUE, pretitle = "", posttitle = "", main = NULL,
-  mainminmax = !bar, mainminmax_minmax = TRUE, afterplotfunc = NULL,
-  cex.main = par()$cex.main, par.list = NULL, xaxis = TRUE,
-  yaxis = TRUE, with_lines = FALSE, lines_only = FALSE, ...)
+cf_grid(
+  x = seq(0, 1, length.out = nrow(z)),
+  y = seq(0, 1, length.out = ncol(z)),
+  z,
+  xlim = range(x, finite = TRUE),
+  ylim = range(y, finite = TRUE),
+  zlim = range(z, finite = TRUE),
+  levels = pretty(zlim, nlevels),
+  nlevels = 20,
+  color.palette = cm.colors.strong,
+  col = color.palette(length(levels) - 1),
+  plot.title,
+  plot.axes,
+  key.title,
+  key.axes,
+  asp = NA,
+  xaxs = "i",
+  yaxs = "i",
+  las = 1,
+  axes = TRUE,
+  frame.plot = axes,
+  bar = F,
+  pts = NULL,
+  reset.par = TRUE,
+  pretitle = "",
+  posttitle = "",
+  main = NULL,
+  mainminmax = !bar,
+  mainminmax_minmax = TRUE,
+  afterplotfunc = NULL,
+  cex.main = par()$cex.main,
+  par.list = NULL,
+  xaxis = TRUE,
+  yaxis = TRUE,
+  with_lines = FALSE,
+  lines_only = FALSE,
+  ...
+)
 }
 \arguments{
 \item{x}{x values, must form grid with y. If not given, it is assumed to be from 0 to 1.}
@@ -35,7 +62,7 @@ cf_grid(x = seq(0, 1, length.out = nrow(z)), y = seq(0, 1, length.out =
 
 \item{color.palette}{A color palette function to be used to assign colors
 in the plot. Defaults to cm.colors.strong. Other options include rainbow,
-heat.colors, terrain.colors, topo.colors, and function(x) {gray((1:x)/x)}.}
+heat.colors, terrain.colors, topo.colors, and function(x) \{gray((1:x)/x)\}.}
 
 \item{col}{an explicit set of colors to be used in the plot. This argument overrides any palette function specification. There should be one less color than levels}
 
@@ -107,7 +134,7 @@ x <- y <- seq(-4*pi, 4*pi, len = 27)
 r <- sqrt(outer(x^2, y^2, "+"))
 cf_grid(cos(r^2)*exp(-r/(2*pi)))
 cf_grid(r, color.palette=heat.colors, bar=TRUE)
-cf_grid(r, color.palette=function(x) {gray((1:x)/x)}, bar=TRUE)
+cf_grid(r, color.palette=function(x) \{gray((1:x)/x)\}, bar=TRUE)
 }
 \references{
 [1] filled.contour R function, copied function but removed part for sidebar

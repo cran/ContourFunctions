@@ -29,7 +29,7 @@
 #' consecutive levels are painted with the same color.
 #' @param color.palette  A color palette function to be used to assign colors
 #' in the plot. Defaults to cm.colors.strong. Other options include rainbow,
-#' heat.colors, terrain.colors, topo.colors, and function(x) {gray((1:x)/x)}.
+#' heat.colors, terrain.colors, topo.colors, and function(x) \{gray((1:x)/x)\}.
 #' @param col  an explicit set of colors to be used in the plot.
 #' This argument overrides any palette function specification.
 #' There should be one less color than levels.
@@ -39,6 +39,7 @@
 #' @param ... Arguments passed to cf_func, and then probably through to cf_grid
 #'
 #' @importFrom graphics contour mtext
+#' @importFrom lhs randomLHS
 #' @return NULL
 #' @export
 #' @references Hwang, Yongmoon, Sang-Lyul Cha, Sehoon Kim, Seung-Seop Jin,

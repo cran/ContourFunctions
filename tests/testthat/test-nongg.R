@@ -30,6 +30,9 @@ test_that("cf_data", {
   x <- runif(20)
   y <- runif(20)
   z <- exp(-(x-.5)^2-5*(y-.5)^2)# + rnorm(20,0,.05)
+  x2 <- runif(100)
+  y2 <- runif(100)
+  z2 <- exp(-(x2-.5)^2-5*(y2-.5)^2)# + rnorm(20,0,.05)
   cf_data(x,y,z)
   cf_data(x,y,z, bar=T)
   cf(x,y,z)
@@ -38,6 +41,13 @@ test_that("cf_data", {
   cf_data(cbind(x,y),y=z)
   cf_data(cbind(x,y),z=z)
   cf_data(cbind(x,y,z))
+  # Fit with other packages
+  expect_error(cf_data(x,y,z, fit="locfit"), NA)
+  # gam needs more data to avoid error
+  expect_error(cf_data(x2,y2,z2, fit="gam"), NA)
+  # Fit binomial
+  expect_error(cf_data(x2, y2, round(pmax(0, pmin(1, z2+rnorm(100,0,.3)))), family="binomial", fit="locfit"), NA)
+  expect_error(cf_data(x2, y2, round(pmax(0, pmin(1, z2+rnorm(100,0,.3)))), family=binomial(), fit="gam"), NA)
   
   # Errors
   expect_error(cf_data(cbind(x,y,y),y=z))

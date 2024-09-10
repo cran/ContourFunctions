@@ -10,11 +10,18 @@
 #' @param xlim  x limits for the contour plot, will be set to data limits +- 5\% if not specified
 #' @param ylim  y limits for the contour plot, will be set to data limits +- 5\% if not specified
 #' @param xylim x and y limits for the contour plot
-#' @param fit Method to fit a model with. Current options are laGP (default)
-#' and mlegp. laGP is faster but might cause trouble.
+#' @param fit Method to fit a model with. Current options are laGP (default),
+#' mlegp, gam (uses mgcv), and locfit. laGP is faster but might cause trouble.
 #' @param gg If TRUE, will use ggplot2 by calling gcf_func
+#' @param show_points Whether the input data points should be shown on the plot.
+#' If missing, is TRUE when there are more than 300 points.
+#' @param family The distribution/link to be used in fitting. Only available
+#' when fit is locfit or mgcv.
 #' @param ...  passed to cf_func
 #' @importFrom utils capture.output
+#' @importFrom stats predict
+#' @importFrom rmarkdown html_vignette 
+#' @importFrom stats lm
 #' @examples 
 #' x <- runif(20)
 #' y <- runif(20)
@@ -25,6 +32,8 @@ cf_data <- function(x, y=NULL, z=NULL,
                     xlim=NULL, ylim=NULL, xylim=NULL,
                     fit="",
                     gg=FALSE,
+                    show_points,
+                    family="gaussian",
                     ...) {
   # Function that creates a contour plot from a data set
   # using a Gaussian process interpolation from mlegp
@@ -49,11 +58,21 @@ cf_data <- function(x, y=NULL, z=NULL,
     y <- x[,2]
     x <- x[,1]
   }
+  # Check fit name given
+  if (fit == "") {
+    if (length(x) > 200 && requireNamespace("locfit", quietly = TRUE)) {
+      fit <- "locfit"
+      message("Fitting with locfit since n > 200")
+    } else {
+      fit <- "lagp"
+      message("Fitting with laGP since n <= 200 (or locfit not available)")
+    }
+  }
   # Fits a Gaussian process model that interpolates perfectly, i.e., no smoothing
-  if (fit == "mlegp") {
+  if (fit == "mlegp" && requireNamespace("mlegp", quietly = TRUE)) {
     co <- capture.output(mod <- mlegp::mlegp(X=data.frame(x,y),Z=z,verbose=0))
     pred.func <- function(xx) {mlegp::predict.gp(mod,xx)}
-  } else {
+  } else if (fit %in% c("lagp") && requireNamespace("laGP", quietly = TRUE)) {
     X <- data.frame(x, y)
     da <- laGP::darg(list(mle=TRUE), X=X)
     ga <- laGP::garg(list(mle=TRUE), y=z)
@@ -63,16 +82,52 @@ cf_data <- function(x, y=NULL, z=NULL,
                     dab=da$ab, gab=ga$ab, verb=0, maxit=1000)
     
     pred.func <- function(xx) {laGP::predGPsep(mod1, xx, lite=TRUE)$mean}
+  } else if (fit == "locfit" && requireNamespace("locfit", quietly = TRUE)) {
+    # browser()
+    X <- data.frame(x, y, z)
+    lfmod <- locfit::locfit(z ~ x + y, data=X, family=family)
+    pred.func <- function(xx) {
+      # browser()
+      predict(lfmod, data.frame(x=xx[,1], y=xx[,2]))
+    }
+  } else if (fit == "gam" && requireNamespace("mgcv", quietly = TRUE)) {
+    # browser()
+    X <- data.frame(x=x, y=y, z=z)
+    gammod <- mgcv::gam(z ~ te(x, y), data=X, family=family)
+    print(gammod)
+    pred.func <- function(xx) {
+      # browser()
+      predict(gammod, data.frame(x=xx[,1], y=xx[,2]), type='response')
+    }
+  } else {
+    warning(paste0("Defaulting to use LM for fit. This is bad. Choose a better",
+                   " option for fit and ensure the package is installed."))
+    X <- data.frame(x=x, y=y, z=z)
+    lmmod <- lm(z ~ x + y + x*y, data=X)
+    pred.func <- function(xx) {
+      # browser()
+      predict(lmmod, data.frame(x=xx[,1], y=xx[,2]), type='response')
+    }
+    # stop(paste0("fit is unknown, or the requested package is not installed"))
   }
   
   minx <- min(x);maxx <- max(x);miny <- min(y);maxy <- max(y)
   if (!is.null(xylim)) {xlim <- ylim <- xylim}
   if(is.null(xlim)) {xlim <- c(minx-.05*(maxx-minx),maxx+.05*(maxx-minx))}
   if(is.null(ylim)) {ylim <- c(miny-.05*(maxy-miny),maxy+.05*(maxy-miny))}
+  # Make pts to pass that will be shown on plot
+  if (missing(show_points)) {
+    show_points <- if (length(x)>300) {F} else {T}
+  }
+  if (show_points) {
+    pts <- cbind(x,y)
+  } else {
+    pts <- NULL
+  }
   # Passes prediction function to cf_func
   if (gg) {
-    gcf_func(fn0 = pred.func,xlim=xlim,ylim=ylim, pts=cbind(x,y), batchmax=500, ...)
+    gcf_func(fn0 = pred.func,xlim=xlim,ylim=ylim, pts=pts, batchmax=500, ...)
   } else {
-    cf_func(fn0 = pred.func,xlim=xlim,ylim=ylim, pts=cbind(x,y), batchmax=500, ...)
+    cf_func(fn0 = pred.func,xlim=xlim,ylim=ylim, pts=pts, batchmax=500, ...)
   }
 }

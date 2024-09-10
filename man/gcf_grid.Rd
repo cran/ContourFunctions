@@ -4,16 +4,35 @@
 \alias{gcf_grid}
 \title{Create contour plot from grid data using ggplot2}
 \usage{
-gcf_grid(x = seq(0, 1, length.out = nrow(z)), y = seq(0, 1, length.out
-  = ncol(z)), z, xlim = range(x, finite = TRUE), ylim = range(y, finite
-  = TRUE), zlim = range(z, finite = TRUE), with_lines = FALSE,
-  lines_only = FALSE, bins = 8, interpolate = TRUE,
-  levels = pretty(zlim, nlevels), nlevels = 20,
-  color.palette = cm.colors.strong, col = color.palette(length(levels)
-  - 1), asp = NA, las = 1, bar = F, pts = NULL, reset.par = TRUE,
-  pretitle = "", posttitle = "", main = NULL, mainminmax = !bar,
-  mainminmax_minmax = TRUE, afterplotfunc = NULL,
-  cex.main = par()$cex.main, ...)
+gcf_grid(
+  x = seq(0, 1, length.out = nrow(z)),
+  y = seq(0, 1, length.out = ncol(z)),
+  z,
+  xlim = range(x, finite = TRUE),
+  ylim = range(y, finite = TRUE),
+  zlim = range(z, finite = TRUE),
+  with_lines = FALSE,
+  lines_only = FALSE,
+  bins = 8,
+  interpolate = TRUE,
+  levels = pretty(zlim, nlevels),
+  nlevels = 20,
+  color.palette = cm.colors.strong,
+  col = color.palette(length(levels) - 1),
+  asp = NA,
+  las = 1,
+  bar = F,
+  pts = NULL,
+  reset.par = TRUE,
+  pretitle = "",
+  posttitle = "",
+  main = NULL,
+  mainminmax = !bar,
+  mainminmax_minmax = TRUE,
+  afterplotfunc = NULL,
+  cex.main = par()$cex.main,
+  ...
+)
 }
 \arguments{
 \item{x}{x values, must form grid with y.
@@ -48,7 +67,7 @@ divided into approximately this many levels.}
 
 \item{color.palette}{a color palette function to be used to assign colors
 in the plot. Defaults to cm.colors. Other options include rainbow,
-heat.colors, terrain.colors, topo.colors, and function(x) {gray((1:x)/x)}.}
+heat.colors, terrain.colors, topo.colors, and function(x) \{gray((1:x)/x)\}.}
 
 \item{col}{an explicit set of colors to be used in the plot. This argument
 overrides any palette function specification. There should be one less

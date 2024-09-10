@@ -4,8 +4,19 @@
 \alias{cf_data}
 \title{Contour plot from data}
 \usage{
-cf_data(x, y = NULL, z = NULL, xlim = NULL, ylim = NULL,
-  xylim = NULL, fit = "", gg = FALSE, ...)
+cf_data(
+  x,
+  y = NULL,
+  z = NULL,
+  xlim = NULL,
+  ylim = NULL,
+  xylim = NULL,
+  fit = "",
+  gg = FALSE,
+  show_points,
+  family = "gaussian",
+  ...
+)
 }
 \arguments{
 \item{x}{either just x data, x and y data, or x, y and z data}
@@ -20,10 +31,16 @@ cf_data(x, y = NULL, z = NULL, xlim = NULL, ylim = NULL,
 
 \item{xylim}{x and y limits for the contour plot}
 
-\item{fit}{Method to fit a model with. Current options are laGP (default)
-and mlegp. laGP is faster but might cause trouble.}
+\item{fit}{Method to fit a model with. Current options are laGP (default),
+mlegp, gam (uses mgcv), and locfit. laGP is faster but might cause trouble.}
 
 \item{gg}{If TRUE, will use ggplot2 by calling gcf_func}
+
+\item{show_points}{Whether the input data points should be shown on the plot.
+If missing, is TRUE when there are more than 300 points.}
+
+\item{family}{The distribution/link to be used in fitting. Only available
+when fit is locfit or mgcv.}
 
 \item{...}{passed to cf_func}
 }
